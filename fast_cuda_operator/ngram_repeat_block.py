@@ -18,10 +18,10 @@ class NGramRepeatBlockFunction(Function):
         """
         Args:
         tokens(Tensor): Input tokens(Bsz*beam, seq_len)
-        lprobs(Tensor): likelihood probability
-        Expected to be updated in place.(Bsz*beam, vocab_size)
+        lprobs(Tensor): likelihood probability of current step
+            Expected to be updated in place.(Bsz*beam, vocab_size)
         bsz(int): batch size
-        step(int): current step
+        step(int): current step: 我们默认tokens[:, 0]是<eos>， tokens[:, :step+1]是previous decoded tokens
         beam_size(int): beam size
         no_repeat_ngram_size(int): Ngram size
         """

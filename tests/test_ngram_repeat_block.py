@@ -8,6 +8,7 @@ import math
 import pytest
 import torch
 from time import time
+import math
 
 from fast_cuda_operator import NGramRepeatBlock
 
@@ -108,7 +109,7 @@ FIXTURES = [
     },
     {
         # 'testcase_name': 'higher_vocab_size',
-        'vocab_size': 1000,
+        'vocab_size': 30000,
         'bsz': 256,
         'beam_size': 1,
         'step': 6,
@@ -138,8 +139,7 @@ def test_ngram_repeat_block_kernel(bsz, beam_size, vocab_size,
 
     lprobs_fairseq = torch.zeros(bsz * beam_size,
                                  vocab_size).type(torch.FloatTensor)
-    lprobs_fastseq = torch.zeros(bsz * beam_size,
-                                 vocab_size).type(torch.FloatTensor)
+    lprobs_fastseq = lprobs_fairseq.clone()
     repeated_ngram = torch.randint(0, 10, (1, 2))
     # second place where ngram is repeated
     pos2 = step - ngram_repeat_block_size + 2

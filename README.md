@@ -5,8 +5,9 @@ Fast C++/CUDA implementations of NLP operations/
 ## Install
 `python setup.py install`
 
-### TODO 用香侬平台发布
-目测需要每个cuda版本发布一个？
+### TODO
+1. 用香侬平台发布
+    * 目测需要每个cuda版本发布一个？
 
 ## Features
 * ngram_block: Seq2Seq时不希望decode重复的ngram

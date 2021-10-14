@@ -9,10 +9,12 @@ Kernel implementation for blocking repeated n-grams.
 #include <vector>
 
 // Ban repeated ngrams of length = 'no_repeat_ngram_size'
-__global__ void banRepeatedTokens(long* __restrict__ tokens,
-                                  float* __restrict__ lprobs,
-                                  int max_predict_len, int vocab_size,
-                                  int no_repeat_ngram_size) {
+template <typename scalar_t>
+__global__ void banRepeatedTokens_kernel(const long* __restrict__ tokens,
+                                         scalar_t* __restrict__ lprobs,
+                                         const size_t max_predict_len,
+                                         const size_t vocab_size,
+                                         const int no_repeat_ngram_size) {
   auto row = blockIdx.x;
   auto col = threadIdx.x;
   auto start = row * (max_predict_len) + col;
@@ -47,24 +49,30 @@ __global__ void banRepeatedTokens(long* __restrict__ tokens,
 // batch size and sequence length and launch
 // kernel
 torch::Tensor ngram_repeat_block_cuda_forward(const torch::Tensor tokens,
-                                              torch::Tensor lprobs, int bsz,
-                                              int step, int beam_size,
-                                              int no_repeat_ngram_size) {
+                                              torch::Tensor lprobs,
+                                              const int bsz,
+                                              const int step,
+                                              const int beam_size,
+                                              const int no_repeat_ngram_size) {
   int threads = step - no_repeat_ngram_size + 2;
   if (threads <= 0) return lprobs;
-  int max_predict_len = tokens.size(1);
-  int vocab_size = lprobs.size(1);
-  auto token_ptr = tokens.data_ptr<long>();
-  auto lprob_ptr = lprobs.data_ptr<float>();
-  int blocks = bsz * beam_size;
-  int shared_mem_size = (step + 1) * sizeof(long);
+  const size_t max_predict_len = tokens.size(1);
+  const size_t vocab_size = lprobs.size(1);
+  const size_t blocks = bsz * beam_size;
+  const int shared_mem_size = (step + 1) * sizeof(long);
 
   // Launching N blocks where N is number of samples in a batch (beams*bsz)
   // Launching T threads where T is number of previous ngrams in a sample
   // Allocating shared mem per block for fastser access of input tokens since
   // each token will be accessed N times to compare with current Ngram where
   // N is Ngram size.
-  banRepeatedTokens<<<blocks, threads, shared_mem_size>>>(
-      token_ptr, lprob_ptr, max_predict_len, vocab_size, no_repeat_ngram_size);
+  AT_DISPATCH_ALL_TYPES(lprobs.scalar_type(), "ngram_block_cuda", ([&] {
+  banRepeatedTokens_kernel<scalar_t><<<blocks, threads, shared_mem_size>>>(
+      tokens.data<long>(),
+      lprobs.data<scalar_t>(),
+      max_predict_len,
+      vocab_size,
+      no_repeat_ngram_size);
+  }));
   return lprobs;
 }
