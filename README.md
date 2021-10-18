@@ -6,8 +6,9 @@ Fast C++/CUDA implementations of NLP operations/
 `python setup.py install`
 
 ### TODO
-1. 用香侬平台发布
-    * 目测需要每个cuda版本发布一个？
+1. 用香侬平台发布，需要做的事情包括
+    * 让gitlab的runner支持cuda编译
+    * 每个cuda版本build一个wheel
 
 ## Features
 * ngram_block: Seq2Seq时不希望decode重复的ngram

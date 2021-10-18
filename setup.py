@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from setuptools import find_packages, setup
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
+from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 extensions = [
     CUDAExtension(
