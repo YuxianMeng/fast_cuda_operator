@@ -12,6 +12,13 @@ extensions = [
             'fast_cuda_operator/clib/ngram_repeat/ngram_repeat_block_cuda_kernel.cu',
         ],
                   ),
+    CUDAExtension(
+        'fast_cuda_operator.clib.src_ngram_repeat.src_ngram_repeat_block',
+        [
+            'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda.cpp',
+            'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda_kernel.cu',
+        ],
+    ),
 ]
 
 setup(
