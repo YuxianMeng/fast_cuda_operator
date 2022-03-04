@@ -17,11 +17,17 @@ __global__ void banRepeatedTokens_kernel(const long* __restrict__ orig_tokens,
                                          const size_t src_len,
                                          const size_t step,
                                          const int vocab_size,
-                                         const int ngram) {
+                                         const int ngram
+                                         ) {
   auto row = blockIdx.x;
   auto col = threadIdx.x;
 //   auto orig_start = row * src_len + col;
   auto tgt_start = (row + 1) * step - ngram + 1;
+  auto origin_token_mask = mask[row * src_len + col + ngram - 1];
+  // 如果待origin_token对应的mask为True，也即已经被保护了，就直接返回
+  if (origin_token_mask){
+    return;
+  }
 
   // 我们存储每句话的tokens到thread-shared memory中，因为这个数据是每个thread共用的，不用每次从global memory取
   // shared[: src_len] 存储当前batch_idx的orig_tokens
@@ -58,16 +64,13 @@ torch::Tensor src_ngram_repeat_cuda_forward(
     const torch::Tensor prev_tokens,
     const torch::Tensor mask,
     const int vocab_size,
-    const int ngram
+    const int ngram,
+    const int pad
   ){
   const size_t step = prev_tokens.size(1);
   const size_t bsz = prev_tokens.size(0);
   const size_t src_len = orig_tokens.size(1);
-  auto options = torch::TensorOptions().dtype(torch::kInt8)
-                                       .layout(torch::kStrided)
-                                       .device(torch::kCUDA)
-                                       .requires_grad(false);
-  torch::Tensor output = torch::full_like(orig_tokens, -1); // 因为ngram repeat的数量不会比原文更长
+  torch::Tensor output = torch::full_like(orig_tokens, pad); // 因为ngram repeat的数量不会比原文更长
   const size_t threads = src_len - ngram + 1;
   if (threads <= 0) return output;
   const size_t blocks = bsz;

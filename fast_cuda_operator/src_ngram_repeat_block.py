@@ -46,7 +46,8 @@ class SrcNGramRepeatBlockFunction(Function):
         prev_tokens: torch.Tensor,
         n: int,
         vocab_size: int,
-        mask: torch.BoolTensor
+        mask: torch.BoolTensor,
+        pad: int = -1
     ):
         """
         Args:
@@ -55,12 +56,13 @@ class SrcNGramRepeatBlockFunction(Function):
             n: 需要计算的ngram重复
             vocab_size: int, 词表大小
             mask: orig_tokens的保护， [bsz, src_len]， True代表这个词不可以被block，False则可以
+            pad: 为了保证返回为tensor，允许pad
         Returns:
             # ngram_block_tokens: LongTensor, 需要block的ngram，是对词表的mask.  [bsz, V]
             ngram_block_tokens: LongTensor, 需要block的ngram，[bsz, src_len]
-               block[i]中包含的是第i个样本中需要block的token idx. -1代表pad
+               block[i]中包含的是第i个样本中需要block的token idx.
         """
-        output = src_ngram_repeat_block.forward(orig_tokens, prev_tokens, mask, vocab_size, n)
+        output = src_ngram_repeat_block.forward(orig_tokens, prev_tokens, mask, vocab_size, n, pad)
         return output
 
     def backward(*args):
@@ -81,7 +83,8 @@ class SrcNGramRepeatBlock(torch.nn.Module):
         prev_tokens: torch.Tensor,
         n: int,
         vocab_size: int,
-        mask: torch.BoolTensor = None
+        mask: torch.BoolTensor = None,
+        pad: int = -1
     ):
         """
         Args:
@@ -90,6 +93,7 @@ class SrcNGramRepeatBlock(torch.nn.Module):
             n: 需要计算的ngram重复
             vocab_size: int, 词表大小
             mask: orig_tokens的保护， [bsz, src_len]， True代表这个词不可以被block，False则可以
+            pad: 为了保证返回为tensor，允许pad
         Returns:
             # ngram_block_tokens: BoolTensor, 需要block的ngram，是对词表的mask.  [bsz, V]
             ngram_block_tokens: LongTensor, 需要block的ngram，[bsz, src_len]
@@ -110,5 +114,6 @@ class SrcNGramRepeatBlock(torch.nn.Module):
             prev_tokens,
             n,
             vocab_size,
-            mask
+            mask,
+            pad
         )

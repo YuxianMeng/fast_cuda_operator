@@ -16,7 +16,8 @@ torch::Tensor src_ngram_repeat_cuda_forward(
     torch::Tensor prev_tokens,
     torch::Tensor mask,
     int vocab_size,
-    int ngram
+    int ngram,
+    int pad
 );
 
 
@@ -31,14 +32,15 @@ torch::Tensor src_ngram_repeat_forward(
     torch::Tensor prev_tokens,
     torch::Tensor mask,
     int vocab_size,
-    int ngram
+    int ngram,
+    int pad
 ) {
   CHECK_INPUT(orig_tokens);
   CHECK_INPUT(prev_tokens);
   assert(ngram > 0);
   assert(vocab_size > 0);
 
-  return src_ngram_repeat_cuda_forward(orig_tokens, prev_tokens, mask, vocab_size, ngram);
+  return src_ngram_repeat_cuda_forward(orig_tokens, prev_tokens, mask, vocab_size, ngram, pad);
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
