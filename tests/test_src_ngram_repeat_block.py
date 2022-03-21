@@ -51,8 +51,8 @@ def get_ngram_block_tokens(
                 continue
             block = True
             for offset in range(n - 1):
-                # if orig_token[orig_start + offset] != prev_token[tgt_start + offset] or sample_mask[orig_start + offset]:
-                if orig_token[orig_start + offset] != prev_token[tgt_start + offset]:
+                if orig_token[orig_start + offset] != prev_token[tgt_start + offset] or sample_mask[
+                    orig_start + offset]:
                     block = False
                     break
             if block:

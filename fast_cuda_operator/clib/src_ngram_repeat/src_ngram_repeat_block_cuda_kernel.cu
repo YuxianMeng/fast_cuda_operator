@@ -23,11 +23,6 @@ __global__ void banRepeatedTokens_kernel(const long* __restrict__ orig_tokens,
   auto col = threadIdx.x;
 //   auto orig_start = row * src_len + col;
   auto tgt_start = (row + 1) * step - ngram + 1;
-  auto origin_token_mask = mask[row * src_len + col + ngram - 1];
-  // 如果待origin_token对应的mask为True，也即已经被保护了，就直接返回
-  if (origin_token_mask){
-    return;
-  }
 
   // 我们存储每句话的tokens到thread-shared memory中，因为这个数据是每个thread共用的，不用每次从global memory取
   // shared[: src_len] 存储当前batch_idx的orig_tokens
@@ -52,6 +47,12 @@ __global__ void banRepeatedTokens_kernel(const long* __restrict__ orig_tokens,
   }
   // reach here means ban
 //   auto token_to_be_banned = orig_tokens[orig_start + ngram - 1];
+  auto origin_token_mask = mask[row * src_len + col + ngram - 1];
+  // 如果待origin_token对应的mask为True，也即已经被保护了，可以返回
+  if (origin_token_mask){
+    return;
+  }
+
   auto token_to_be_banned = tokens_shm[col + ngram - 1];
   output[row * src_len + col] = token_to_be_banned;
 }

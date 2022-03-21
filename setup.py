@@ -23,7 +23,7 @@ extensions = [
 
 setup(
     name="fast_cuda_operator",
-    version="0.0.1",
+    version="0.0.2",
     author="Yuxian Meng",
     author_email="yuxian_meng@shannonai.com",
     description="fast C++/CUDA implementations of nlp operations",
