@@ -74,6 +74,7 @@ torch::Tensor src_ngram_repeat_cuda_forward(
   torch::Tensor output = torch::full_like(orig_tokens, pad); // 因为ngram repeat的数量不会比原文更长
   const size_t threads = src_len - ngram + 1;
   if (threads <= 0) return output;
+  if (step+1 < ngram) return output;
   const size_t blocks = bsz;
   const int shared_mem_size = (src_len+step) * sizeof(long);
   // Launching N blocks where N is number of samples in a batch

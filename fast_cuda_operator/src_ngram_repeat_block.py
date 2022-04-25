@@ -62,6 +62,8 @@ class SrcNGramRepeatBlockFunction(Function):
             ngram_block_tokens: LongTensor, 需要block的ngram，[bsz, src_len]
                block[i]中包含的是第i个样本中需要block的token idx.
         """
+        if n > orig_tokens.size(1) or n > prev_tokens.size(1)+1:
+            return torch.full_like(orig_tokens, fill_value=pad)
         output = src_ngram_repeat_block.forward(orig_tokens, prev_tokens, mask, vocab_size, n, pad)
         return output
 
