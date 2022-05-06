@@ -7,6 +7,7 @@ Kernel implementation for blocking repeated n-grams.
 #include <math.h>
 #include <torch/extension.h>
 #include <vector>
+#include <c10/cuda/CUDAGuard.h>
 
 // Ban repeated ngrams of length = 'no_repeat_ngram_size'
 template <typename scalar_t>
@@ -54,6 +55,7 @@ torch::Tensor ngram_repeat_block_cuda_forward(const torch::Tensor tokens,
                                               const int step,
                                               const int beam_size,
                                               const int no_repeat_ngram_size) {
+  const at::cuda::OptionalCUDAGuard device_guard(device_of(tokens));
   int threads = step - no_repeat_ngram_size + 2;
   if (threads <= 0) return lprobs;
   const size_t max_predict_len = tokens.size(1);

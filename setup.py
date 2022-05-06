@@ -57,4 +57,5 @@ setup(
     cmdclass={
         'build_ext': BuildExtension
     },
+    include_package_data=True
 )
