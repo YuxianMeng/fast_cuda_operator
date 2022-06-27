@@ -8,6 +8,7 @@ from time import time
 import torch
 
 from fast_cuda_operator import SrcNGramRepeatBlock
+from fast_cuda_operator.src_ngram_repeat_block import index2mask
 
 
 def get_ngram_block_tokens(
@@ -61,11 +62,12 @@ def get_ngram_block_tokens(
     return output
 
 
-def test_ngram_repeat_block_kernel():
+def test_ngram_repeat_block_kernel(device="cuda:0"):
     """"""
-    orig_tokens = torch.LongTensor([[0, 1, 2, 3], [4, 5, 6, 7]]).cuda()
-    prev_tokens = torch.LongTensor([[0, 1, 2], [4, 5, 6]]).cuda()
-    mask = torch.zeros_like(orig_tokens).bool().cuda()
+    orig_tokens = torch.LongTensor([[0, 1, 2, 3], [4, 5, 6, 7]]).to(device)
+    prev_tokens = torch.LongTensor([[0, 1, 2], [4, 5, 6]]).to(device)
+    vocab_size = 8
+    mask = torch.zeros_like(orig_tokens).bool().to(device)
 
     orig_tokens = torch.cat([orig_tokens] * 100, dim=0)
     prev_tokens = torch.cat([prev_tokens] * 100, dim=0)
@@ -75,10 +77,10 @@ def test_ngram_repeat_block_kernel():
 
     # Cuda opt implementation
     t = time()
-    output_fast = module(orig_tokens, prev_tokens, 4, 8, mask)
+    output_fast = index2mask(module(orig_tokens, prev_tokens, 4, vocab_size, mask), vocab_size=vocab_size)
     print("optimized t:", time() - t)
     # Original implementation
     t = time()
-    output_slow = get_ngram_block_tokens(orig_tokens, prev_tokens, 4, vocab_size=8, mask=mask)
+    output_slow = get_ngram_block_tokens(orig_tokens, prev_tokens, 4, vocab_size=vocab_size, mask=mask)
     print("naive t:", time() - t)
     assert torch.all(output_slow == output_fast)

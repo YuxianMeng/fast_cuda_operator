@@ -22,7 +22,7 @@ __global__ void banRepeatedTokens_kernel(torch::PackedTensorAccessor32<scalar_t,
                                          ) {
   auto row = blockIdx.x;
   auto col = threadIdx.x;
-  auto tgt_start = (row + 1) * step - ngram + 1;
+//   auto tgt_start = (row + 1) * step - ngram + 1;
 
 //   我们存储每句话的tokens到thread-shared memory中，因为这个数据是每个thread共用的，不用每次从global memory取
 //   shared[: src_len] 存储当前batch_idx的orig_tokens
@@ -40,7 +40,7 @@ __global__ void banRepeatedTokens_kernel(torch::PackedTensorAccessor32<scalar_t,
 
   for (int k = 0; k < ngram - 1; k++) {
     if (tokens_shm[col + k] != tokens_shm[src_len + k]
-        or mask[row][col + k]
+//         or mask[row][col + k]
         ) {
       return;
     }
@@ -54,6 +54,30 @@ __global__ void banRepeatedTokens_kernel(torch::PackedTensorAccessor32<scalar_t,
 
   auto token_to_be_banned = tokens_shm[col + ngram - 1];
   output[row][col] = token_to_be_banned;
+//   // todo
+//   // 新版mask逻辑：往前找是否存在连续的ngram个重复且没有被mask的token
+//   auto token_to_be_banned = tokens_shm[col + ngram - 1];
+//   auto origin_token_mask = mask[row][col + ngram - 1];
+//   // 如果待origin_token对应的mask为True，也即已经被保护了，可以返回
+//   if (origin_token_mask){
+//     return;
+//   }
+//   int repeat_ngram = 0;
+//   for (int k = ngram-2; k >-col; k--) {
+//     if (tokens_shm[step-1] == prev_tokens[src_len + ngram - 2 - repeat_ngram]
+//         and not mask[row][col + k]
+//         ) {
+//         repeat_ngram++;
+//       if (repeat_ngram == ngram-1){
+//         output[row][col] = token_to_be_banned;
+//         return;
+//       }
+//     }
+//     else if (tokens_shm[col+k] != tokens_shm[src_len + ngram - 2 - repeat_ngram]
+//              and not mask[row][col + k]){
+//         return;
+//     }
+//   }
 
 }
 
