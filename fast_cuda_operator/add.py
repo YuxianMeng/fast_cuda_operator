@@ -41,7 +41,7 @@ class AddModule(torch.nn.Module):
         y: torch.Tensor,
     ):
         """
-        对两个形状为[bsz, seq_len]的tensor做假发
+        对两个形状为[bsz, seq_len]的tensor做加法
         Examples:
         >>> device = "cuda:1"
         >>> x = torch.LongTensor([[0,1,2,3],[4,5,6,7]]).to(device)

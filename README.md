@@ -2,7 +2,7 @@
 
 Fast C++/CUDA implementations of NLP operations
 
-**强烈建议开发前先阅读官方的[PyTorch Cpp/CUDA extension tutorial](https://pytorch.org/tutorials/advanced/cpp_extension.html)**
+**强烈建议开发前先阅读官方的[PyTorch C++/CUDA extension tutorial](https://pytorch.org/tutorials/advanced/cpp_extension.html)**
 
 ## Install
 `python setup.py install`
