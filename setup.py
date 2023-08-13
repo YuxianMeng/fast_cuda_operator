@@ -5,18 +5,25 @@ from setuptools import find_packages, setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 extensions = [
+    # CUDAExtension(
+    #     'fast_cuda_operator.clib.ngram_repeat.ngram_repeat_block',
+    #     [
+    #         'fast_cuda_operator/clib/ngram_repeat/ngram_repeat_block_cuda.cpp',
+    #         'fast_cuda_operator/clib/ngram_repeat/ngram_repeat_block_cuda_kernel.cu',
+    #     ],
+    #               ),
+    # CUDAExtension(
+    #     'fast_cuda_operator.clib.src_ngram_repeat.src_ngram_repeat_block',
+    #     [
+    #         'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda.cpp',
+    #         'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda_kernel.cu',
+    #     ],
+    # ),
     CUDAExtension(
-        'fast_cuda_operator.clib.ngram_repeat.ngram_repeat_block',
+        'fast_cuda_operator.clib.cum_mul_sum.cum_mul_sum',
         [
-            'fast_cuda_operator/clib/ngram_repeat/ngram_repeat_block_cuda.cpp',
-            'fast_cuda_operator/clib/ngram_repeat/ngram_repeat_block_cuda_kernel.cu',
-        ],
-                  ),
-    CUDAExtension(
-        'fast_cuda_operator.clib.src_ngram_repeat.src_ngram_repeat_block',
-        [
-            'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda.cpp',
-            'fast_cuda_operator/clib/src_ngram_repeat/src_ngram_repeat_block_cuda_kernel.cu',
+            'fast_cuda_operator/clib/cum_mul_sum/cum_mul_sum_cuda.cpp',
+            'fast_cuda_operator/clib/cum_mul_sum/cum_mul_sum_cuda_kernel.cu',
         ],
     ),
 ]
@@ -25,13 +32,13 @@ setup(
     name="fast_cuda_operator",
     version="0.0.2",
     author="Yuxian Meng",
-    author_email="yuxian_meng@shannonai.com",
-    description="fast C++/CUDA implementations of nlp operations",
+    # author_email="yuxian_meng@shannonai.com",
+    # description="fast C++/CUDA implementations of nlp operations",
     long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     keywords="NLP NLG deep learning transformer sequence pytorch tensorflow BERT GPT GPT-2 Microsoft",
     license="MIT",
-    url="https://github.com/microsoft/fastseq",
+    # url="https://github.com/microsoft/fastseq",
     packages=find_packages(where=".", exclude=["benchmarks", "tests", "__py_cache__"]),
     setup_requires=[
         'torch',

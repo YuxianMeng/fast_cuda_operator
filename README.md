@@ -22,8 +22,8 @@ Fast C++/CUDA implementations of NLP operations
 ├── setup.py
     ...
 ```
-我们以简单的`add_example`算子为例，我们通过在`fast_cuda_operator/clib/add_example`中定义的[`add_cuda.cpp`](fast_cuda_operator/clib/add_example/add_cuda.cpp)作为C++ extension，
-并在其中调用[`add_cuda_kernel.cu`](fast_cuda_operator/clib/add_example/add_cuda_kernel.cu)
+我们以简单的`add_example`算子为例，我们通过在`fast_cuda_operator/clib/add_example`中定义的[`add_cuda.cpp`](fast_cuda_operator/clib/add_example/cum_mul_sum.cpp)作为C++ extension，
+并在其中调用[`add_cuda_kernel.cu`](fast_cuda_operator/clib/add_example/cum_mul_sum_cuda_kernel.cu)
 中的CUDA算子。通过`python setup.py install`编译后就可以在[`fast_cuda_operator/add.py`](fast_cuda_operator/add.py)中进行调用测试了。
 
 ### TODO

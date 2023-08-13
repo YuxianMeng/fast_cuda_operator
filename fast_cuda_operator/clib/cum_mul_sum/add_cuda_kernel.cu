@@ -15,7 +15,8 @@ Kernel implementation for blocking repeated n-grams.
 template <typename scalar_t>
 __global__ void add_kernel(torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> x,
                            torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> y,
-                           torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output
+                           torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output,
+                           seq_len
                            ) {
   auto r = blockIdx.x;
   auto c = threadIdx.x;
@@ -34,11 +35,17 @@ torch::Tensor add_cuda_forward(
   const at::cuda::OptionalCUDAGuard device_guard(device_of(x));
   auto output = torch::zeros_like(x);
 
-  AT_DISPATCH_ALL_TYPES(x.type(), "add_cuda", ([&] {
-  add_kernel<scalar_t><<<bsz, seq_len>>>(
-      x.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
-      y.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
-      output.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>());
-  }));
+  AT_DISPATCH_ALL_TYPES(
+      x.type(),
+      "add_cuda",
+      ([&] {
+              add_kernel<scalar_t><<<bsz, 2>>>(
+                  x.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
+                  y.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
+                  output.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>()
+                  );
+          }
+      )
+  );
   return output;
 }

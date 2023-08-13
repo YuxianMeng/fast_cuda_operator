@@ -1,0 +1,2 @@
+include shannon_ner/package_data/*.json
+include shannon_ner/package_data/*.txt
